@@ -17,7 +17,7 @@ miFrame.config(width='850', height='650')
 serialCOM = None
 current_value = StringVar()
 debug = IntVar()
-opcionEscritura = IntVar()
+opcionLectEscr = IntVar()
 
 ValoresComList = [f'COM{v + 1}' for v in range(256)]
 
@@ -31,11 +31,17 @@ puerto = Spinbox(miFrame, values=ValoresComList, textvariable=current_value, jus
 botonCerrarPuerto = Button(miFrame, text='Cerrar', state=DISABLED, width=8, font=('Sans Serif', 13))
 
 
-seleccionEscritura1 = Radiobutton(miFrame, text="Memoria instrucciones", state=DISABLED, variable=opcionEscritura,
+seleccionEscritura1 = Radiobutton(miFrame, text="Memoria instrucciones", state=DISABLED, variable=opcionLectEscr,
                                   value=1, bg='grey', font=('Sans Serif', 13))
 
-seleccionEscritura2 = Radiobutton(miFrame, text="Memoria externa", state=DISABLED, variable=opcionEscritura,
+seleccionEscritura2 = Radiobutton(miFrame, text="Memoria externa", state=DISABLED, variable=opcionLectEscr,
                                   value=2, bg='grey', font=('Sans Serif', 13))
+
+seleccionLectura1 = Radiobutton(miFrame, text="Memoria instrucciones", state=DISABLED, variable=opcionLectEscr,
+                                  value=3, bg='grey', font=('Sans Serif', 13))
+
+seleccionLectura2 = Radiobutton(miFrame, text="Memoria externa", state=DISABLED, variable=opcionLectEscr,
+                                  value=4, bg='grey', font=('Sans Serif', 13))
 
 
 debugCheck = Checkbutton(miFrame, text="Activar modo debug del sistema", variable=debug, state=DISABLED,
@@ -70,6 +76,8 @@ def controlControles(booleanControl):
 
     seleccionEscritura1.config(state=DISABLED)
     seleccionEscritura2.config(state=DISABLED)
+    seleccionLectura1.config(state=DISABLED)
+    seleccionLectura2.config(state=DISABLED)
     botonEnvioExt.config(state=DISABLED)
 
     debugCheck.deselect()
@@ -89,15 +97,23 @@ def _enviaDatos():
 
 
 def _wrInstr():
-    logicaEnvio.selec(opcionEscritura)
+    logicaEnvio.selec(opcionLectEscr)
     botonEnvio.config(state=NORMAL)
     botonEnvioExt.config(state=DISABLED)
 
 
 def _wrExt():
-    logicaEnvio.selec(opcionEscritura)
+    logicaEnvio.selec(opcionLectEscr)
     botonEnvio.config(state=DISABLED)
     botonEnvioExt.config(state=NORMAL)
+
+def _rdInstr():
+    botonEnvio.config(state=DISABLED)
+    botonEnvioExt.config(state=DISABLED)
+
+def _rdExt():
+    botonEnvio.config(state=DISABLED)
+    botonEnvioExt.config(state=DISABLED)
 
 
 def _debugIntrucc():
@@ -105,9 +121,13 @@ def _debugIntrucc():
     if debug.get() == 1:
         seleccionEscritura1.config(state=NORMAL)
         seleccionEscritura2.config(state=NORMAL)
+        seleccionLectura1.config(state=NORMAL)
+        seleccionLectura2.config(state=NORMAL)
     else:
         seleccionEscritura1.config(state=DISABLED)
         seleccionEscritura2.config(state=DISABLED)
+        seleccionLectura1.config(state=DISABLED)
+        seleccionLectura2.config(state=DISABLED)
 
 
 def _sendExt():
@@ -121,12 +141,17 @@ seleccionEscritura1.config(command=_wrInstr)
 seleccionEscritura2.config(command=_wrExt)
 debugCheck.config(command=_debugIntrucc)
 botonEnvioExt.config(command=_sendExt)
+seleccionLectura1.config(command=_rdInstr)
+seleccionLectura2.config(command=_rdExt)
 
 logo = PhotoImage(file='logo.gif').subsample(4)
 Label(miFrame, image=logo, bg='grey').place(x=750, y=550)
 Label(miFrame, text='Inserta el código en hexadecimal', bg='grey', font=('Sans Serif', 13)).place(x=50, y=20)
 Label(miFrame, text='Configuración del puerto serie', bg='grey', font=('Sans Serif', 13)).place(x=400, y=20)
 Label(miFrame, text='Selecciona el destino a escribir:', bg='grey', font=('Sans Serif', 13)).place(x=400, y=150)
+Label(miFrame, text='Dirección:', bg='grey', font=('Sans Serif', 13)).place(x=550, y=250)
+Label(miFrame, text='Datos:', bg='grey', font=('Sans Serif', 13)).place(x=550, y=280)
+Label(miFrame, text='Selecciona el destino a leer:', bg='grey', font=('Sans Serif', 13)).place(x=400, y=340)
 
 cuadroTexto.place(x=50, y=50)
 botonEnvio.place(x=90, y=550)
@@ -139,5 +164,7 @@ debugCheck.place(x=350, y=110)
 addressExt.place(x=610, y=250)
 dataExt.place(x=610, y=280)
 botonEnvioExt.place(x=760, y=260)
+seleccionLectura1.place(x=450, y=370)
+seleccionLectura2.place(x=450, y=400)
 
 raiz.mainloop()
