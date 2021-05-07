@@ -31,7 +31,7 @@ def cerrarPuerto(serial):
         messagebox.showerror('ERROR', 'Error al cerrar el puerto!')
 
 
-def selec(opcion):
+def selec(serialCOM,opcion):
     print(opcion.get())
 
 

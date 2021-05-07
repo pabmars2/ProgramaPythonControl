@@ -1,3 +1,4 @@
+import tkinter
 from tkinter import *
 import logicaEnvio
 
@@ -14,8 +15,11 @@ miFrame.pack(fill='both', expand='True')
 miFrame.config(bg='grey')
 miFrame.config(width='850', height='650')
 
+newWindow = miFrame
+flagNewWindow = False
 serialCOM = None
 current_value = StringVar()
+current_value_addr = StringVar()
 debug = IntVar()
 opcionLectEscr = IntVar()
 
@@ -25,11 +29,9 @@ cuadroTexto = Text(miFrame, font=('Sans Serif', 13), width=27, height=25)
 
 botonEnvio = Button(miFrame, text='Enviar', state=DISABLED, width=18, font=('Sans Serif', 13))
 
-
 puerto = Spinbox(miFrame, values=ValoresComList, textvariable=current_value, justify=RIGHT, font=('Sans Serif', 13))
 
 botonCerrarPuerto = Button(miFrame, text='Cerrar', state=DISABLED, width=8, font=('Sans Serif', 13))
-
 
 seleccionEscritura1 = Radiobutton(miFrame, text="Memoria instrucciones", state=DISABLED, variable=opcionLectEscr,
                                   value=1, bg='grey', font=('Sans Serif', 13))
@@ -38,11 +40,13 @@ seleccionEscritura2 = Radiobutton(miFrame, text="Memoria externa", state=DISABLE
                                   value=2, bg='grey', font=('Sans Serif', 13))
 
 seleccionLectura1 = Radiobutton(miFrame, text="Memoria instrucciones", state=DISABLED, variable=opcionLectEscr,
-                                  value=3, bg='grey', font=('Sans Serif', 13))
+                                value=3, bg='grey', font=('Sans Serif', 13))
 
 seleccionLectura2 = Radiobutton(miFrame, text="Memoria externa", state=DISABLED, variable=opcionLectEscr,
-                                  value=4, bg='grey', font=('Sans Serif', 13))
+                                value=4, bg='grey', font=('Sans Serif', 13))
 
+seleccionLecturaPC = Radiobutton(miFrame, text="PC actual y próximo:", state=DISABLED, variable=opcionLectEscr,
+                                 value=5, bg='grey', font=('Sans Serif', 13))
 
 debugCheck = Checkbutton(miFrame, text="Activar modo debug del sistema", variable=debug, state=DISABLED,
                          onvalue=1, offvalue=0, bg='grey', font=('Sans Serif', 13))
@@ -54,7 +58,15 @@ addressExt = Entry(miFrame, font=('Sans Serif', 13), width=13, justify=RIGHT)
 dataExt = Entry(miFrame, font=('Sans Serif', 13), width=13, justify=RIGHT)
 
 botonEnvioExt = Button(miFrame, text='Enviar', state=DISABLED,
-                    width=5, font=('Sans Serif', 13))
+                       width=5, font=('Sans Serif', 13))
+
+initialAddress = Entry(miFrame, font=('Sans Serif', 13), width=13, justify=RIGHT)
+
+numAdresses = Spinbox(miFrame, from_=0, to=10, textvariable=current_value_addr, justify=RIGHT, font=('Sans Serif', 13))
+
+botonRx = Button(miFrame, text='Recibir datos', state=DISABLED,
+                 font=('Sans Serif', 13))
+
 
 def _cerrarPuerto():
     logicaEnvio.cerrarPuerto(serialCOM)
@@ -78,7 +90,9 @@ def controlControles(booleanControl):
     seleccionEscritura2.config(state=DISABLED)
     seleccionLectura1.config(state=DISABLED)
     seleccionLectura2.config(state=DISABLED)
+    seleccionLecturaPC.config(state=DISABLED)
     botonEnvioExt.config(state=DISABLED)
+    botonRx.config(state=DISABLED)
 
     debugCheck.deselect()
 
@@ -97,24 +111,35 @@ def _enviaDatos():
 
 
 def _wrInstr():
-    logicaEnvio.selec(opcionLectEscr)
+    logicaEnvio.selec(serialCOM, opcionLectEscr)
     botonEnvio.config(state=NORMAL)
     botonEnvioExt.config(state=DISABLED)
+    botonRx.config(state=DISABLED)
 
 
 def _wrExt():
-    logicaEnvio.selec(opcionLectEscr)
+    logicaEnvio.selec(serialCOM, opcionLectEscr)
     botonEnvio.config(state=DISABLED)
     botonEnvioExt.config(state=NORMAL)
+    botonRx.config(state=DISABLED)
+
+
+def _newWindow():
+    global newWindow
+    newWindow = tkinter.Toplevel(raiz)
+
 
 def _rdInstr():
     botonEnvio.config(state=DISABLED)
     botonEnvioExt.config(state=DISABLED)
+    botonRx.config(state=NORMAL)
+    logicaEnvio.selec(serialCOM, opcionLectEscr)
 
 def _rdExt():
     botonEnvio.config(state=DISABLED)
     botonEnvioExt.config(state=DISABLED)
-
+    botonRx.config(state=NORMAL)
+    logicaEnvio.selec(serialCOM, opcionLectEscr)
 
 def _debugIntrucc():
     logicaEnvio.debugMode(serialCOM, debug)
@@ -123,15 +148,47 @@ def _debugIntrucc():
         seleccionEscritura2.config(state=NORMAL)
         seleccionLectura1.config(state=NORMAL)
         seleccionLectura2.config(state=NORMAL)
+        seleccionLecturaPC.config(state=NORMAL)
     else:
         seleccionEscritura1.config(state=DISABLED)
         seleccionEscritura2.config(state=DISABLED)
         seleccionLectura1.config(state=DISABLED)
         seleccionLectura2.config(state=DISABLED)
+        seleccionLecturaPC.config(state=DISABLED)
 
 
 def _sendExt():
     print('Print ext')
+
+
+def _rdPC():
+    global flagNewWindow
+
+    if flagNewWindow:
+        newWindow.destroy()
+        flagNewWindow = False
+
+    if not flagNewWindow:
+        _newWindow()
+        flagNewWindow = True
+
+    botonEnvio.config(state=DISABLED)
+    botonEnvioExt.config(state=DISABLED)
+    botonRx.config(state=DISABLED)
+
+    logicaEnvio.selec(serialCOM, opcionLectEscr)
+
+
+def _rx():
+    global flagNewWindow
+
+    if flagNewWindow:
+        newWindow.destroy()
+        flagNewWindow = False
+
+    if not flagNewWindow:
+        _newWindow()
+        flagNewWindow = True
 
 
 botonAbrirPuerto.config(command=logica)
@@ -143,6 +200,8 @@ debugCheck.config(command=_debugIntrucc)
 botonEnvioExt.config(command=_sendExt)
 seleccionLectura1.config(command=_rdInstr)
 seleccionLectura2.config(command=_rdExt)
+seleccionLecturaPC.config(command=_rdPC)
+botonRx.config(command=_rx)
 
 logo = PhotoImage(file='logo.gif').subsample(4)
 Label(miFrame, image=logo, bg='grey').place(x=750, y=550)
@@ -152,6 +211,8 @@ Label(miFrame, text='Selecciona el destino a escribir:', bg='grey', font=('Sans 
 Label(miFrame, text='Dirección:', bg='grey', font=('Sans Serif', 13)).place(x=550, y=250)
 Label(miFrame, text='Datos:', bg='grey', font=('Sans Serif', 13)).place(x=550, y=280)
 Label(miFrame, text='Selecciona el destino a leer:', bg='grey', font=('Sans Serif', 13)).place(x=400, y=340)
+Label(miFrame, text='Dirección inicial:', bg='grey', font=('Sans Serif', 13)).place(x=550, y=440)
+Label(miFrame, text='Numero de direcciones:', bg='grey', font=('Sans Serif', 13)).place(x=550, y=470)
 
 cuadroTexto.place(x=50, y=50)
 botonEnvio.place(x=90, y=550)
@@ -166,5 +227,9 @@ dataExt.place(x=610, y=280)
 botonEnvioExt.place(x=760, y=260)
 seleccionLectura1.place(x=450, y=370)
 seleccionLectura2.place(x=450, y=400)
+seleccionLecturaPC.place(x=450, y=550)
+initialAddress.place(x=675, y=440)
+numAdresses.place(x=600, y=470)
+botonRx.place(x=690, y=510)
 
 raiz.mainloop()
