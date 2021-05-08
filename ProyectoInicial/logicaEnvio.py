@@ -3,9 +3,23 @@ import serial
 from serial.serialutil import SerialException
 
 
-def enviarDatos(serialCOM,pepe):
-    print(pepe[:-1])
-    print('eviar')
+def enviarDatos(serialCOM, datos, registro):
+    for i in range(7, -1, -2):
+        cod = datos[i - 1:i + 1]
+        cod = bytearray.fromhex(cod)
+        serialCOM.write(cod)
+
+    if registro == 0:
+        thestring = b'\x00'
+        serialCOM.write(thestring)
+
+    if registro == 1:
+        thestring = b'\x01'
+        serialCOM.write(thestring)
+
+    if registro == 2:
+        thestring = b'\x02'
+        serialCOM.write(thestring)
 
 
 def abrirPuerto(indice):
@@ -15,7 +29,8 @@ def abrirPuerto(indice):
             baudrate=115200,
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
-            bytesize=serial.EIGHTBITS
+            bytesize=serial.EIGHTBITS,
+            timeout=1
         )
         messagebox.showinfo('Información', 'Puerto ' + indice + ' abierto correctamente!')
         return ser
@@ -31,8 +46,14 @@ def cerrarPuerto(serial):
         messagebox.showerror('ERROR', 'Error al cerrar el puerto!')
 
 
-def selec(serialCOM,opcion):
-    print(opcion.get())
+def enviarExt(serialCOM, addressExt, dataExt):
+    if (len(addressExt) != 8) | (len(dataExt) != 8):
+        messagebox.showerror('ERROR', 'Longitud incorrecta, solo permitido 8 bytes.')
+    else:
+        enviarDatos(serialCOM, addressExt, 1)
+        enviarDatos(serialCOM, dataExt, 2)
+        messagebox.showinfo('Información', 'Datos enviados correctamente!')
+
 
 
 def debugMode(serialCOM, debug):
@@ -42,3 +63,103 @@ def debugMode(serialCOM, debug):
     else:
         thestring = b'\x01\x00\x00\x00\x00'
         serialCOM.write(thestring)
+
+
+def ejecSteps(serialCOM, stateSteps, numSteps):
+    if stateSteps:
+        if numSteps == 1:
+            thestring = b'\x08\x00\x40\x00\x00'
+            serialCOM.write(thestring)
+
+        if numSteps == 2:
+            thestring = b'\x08\x00\x80\x00\x00'
+            serialCOM.write(thestring)
+
+        if numSteps == 3:
+            thestring = b'\x08\x00\xc0\x00\x00'
+            serialCOM.write(thestring)
+
+        if numSteps == 4:
+            thestring = b'\x08\x00\x00\x01\x00'
+            serialCOM.write(thestring)
+
+        if numSteps == 5:
+            thestring = b'\x08\x00\x40\x01\x00'
+            serialCOM.write(thestring)
+
+        if numSteps == 6:
+            thestring = b'\x08\x00\x80\x01\x00'
+            serialCOM.write(thestring)
+
+        if numSteps == 7:
+            thestring = b'\x08\x00\xc0\x01\x00'
+            serialCOM.write(thestring)
+
+        if numSteps == 8:
+            thestring = b'\x08\x00\x00\x02\x00'
+            serialCOM.write(thestring)
+
+        if numSteps == 9:
+            thestring = b'\x08\x00\x40\x02\x00'
+            serialCOM.write(thestring)
+
+        if numSteps == 10:
+            thestring = b'\x08\x00\x80\x02\x00'
+            serialCOM.write(thestring)
+
+        messagebox.showinfo('Información', 'Ejecutando ' + numSteps + ' pasos en el sistema!')
+    else:
+        thestring = b'\x00\x00\x00\x00\x00'
+        serialCOM.write(thestring)
+
+
+def recibirDatos(serialCOM, address, nData, tipo):
+    datos = ''
+
+    if len(address) != 8 :
+        messagebox.showerror('ERROR', 'Longitud incorrecta, solo permitido 8 bytes.')
+    else:
+        addressToSend = address
+
+        for i in range(int(nData)):
+            enviarDatos(serialCOM, addressToSend, 1)
+            addressToSend = int(addressToSend, 16)
+            addressToSend = addressToSend + 4
+            addressToSend = hex(addressToSend)
+            addressToSend = addressToSend[2:]
+
+            if tipo == 0:
+                thestring = b'\x20\x00\x00\x00\x00'
+                serialCOM.write(thestring)
+            if tipo == 1:
+                thestring = b'\x10\x00\x00\x00\x00'
+                serialCOM.write(thestring)
+
+            recepcion = serialCOM.read(4)
+
+            if recepcion == b'' :
+                messagebox.showerror('ERROR', 'Error al recibir datos.')
+            else:
+                datos = recepcion, datos
+
+        return datos
+
+def readPC(serialCOM, tipo):
+    datos = ''
+
+    if tipo == 0:
+        thestring = b'\x50\x00\x00\x00\x00'
+        serialCOM.write(thestring)
+    if tipo == 1:
+        thestring = b'\x60\x00\x00\x00\x00'
+        serialCOM.write(thestring)
+
+    recepcion = serialCOM.read(4)
+
+    if recepcion == b'':
+        messagebox.showerror('ERROR', 'Error al recibir datos.')
+    else:
+        datos = recepcion, datos
+
+
+    return datos
