@@ -54,7 +54,7 @@ debugCheck = Checkbutton(miFrame, text="Activar modo debug del sistema", variabl
                          onvalue=1, offvalue=0, bg='grey', font=('Sans Serif', 13))
 
 steps = Checkbutton(miFrame, text="Activar modo ejecución por pasos", variable=step, state=DISABLED,
-                         onvalue=1, offvalue=0, bg='grey', font=('Sans Serif', 13))
+                    onvalue=1, offvalue=0, bg='grey', font=('Sans Serif', 13))
 
 botonAbrirPuerto = Button(miFrame, text='Abrir', state=NORMAL, width=8, font=('Sans Serif', 13))
 
@@ -87,7 +87,7 @@ def controlControles(booleanControl):
         accion = NORMAL
         accionExtra = DISABLED
 
-    botonEnvio.config(state=accion)
+    botonEnvio.config(state=DISABLED)
     botonAbrirPuerto.config(state=accionExtra)
     puerto.config(state=accionExtra)
     botonCerrarPuerto.config(state=accion)
@@ -116,11 +116,22 @@ def logica():
 
 
 def _enviaDatos():
-    logicaEnvio.enviarDatos(serialCOM, cuadroTexto.get(1.0, END))
+    datos = cuadroTexto.get(1.0, END)
+    datos_aux = ''
+    datos_salida = list()
+    for i in range(len(datos)):
+        cod = datos[i:i + 1]
+
+        if cod != '\n':
+            datos_aux = datos_aux + cod
+        else:
+            datos_salida.append(datos_aux)
+            datos_aux = ''
+
+    logicaEnvio.enviarDatosInstr(serialCOM, datos_salida)
 
 
 def _wrInstr():
-    #logicaEnvio.selec(serialCOM, opcionLectEscr)
     botonEnvio.config(state=NORMAL)
     botonEnvioExt.config(state=DISABLED)
     botonRx.config(state=DISABLED)
@@ -138,21 +149,23 @@ def _newWindow():
     newWindow.title('Datos recibidos')
     newWindow.resizable(0, 0)  # niega el redimensionamiento
     newWindow.iconbitmap('icono.ico')  # determinamos el icono
-    newWindow.geometry('300x300')  # ancho x alto
+    newWindow.geometry('400x400')  # ancho x alto
     newWindow.config(bg='grey')  # color de fondo
+    Label(newWindow, text='Numero de direcciones:', bg='grey', font=('Sans Serif', 13)).place(x=100, y=100)
+
 
 
 def _rdInstr():
     botonEnvio.config(state=DISABLED)
     botonEnvioExt.config(state=DISABLED)
     botonRx.config(state=NORMAL)
-    #logicaEnvio.selec(serialCOM, opcionLectEscr)
+
 
 def _rdExt():
     botonEnvio.config(state=DISABLED)
     botonEnvioExt.config(state=DISABLED)
     botonRx.config(state=NORMAL)
-    #logicaEnvio.selec(serialCOM, opcionLectEscr)
+
 
 def _debugIntrucc():
     logicaEnvio.debugMode(serialCOM, debug.get())
@@ -172,7 +185,6 @@ def _debugIntrucc():
 
 def _sendExt():
     logicaEnvio.enviarExt(serialCOM, addressExt.get(), dataExt.get())
-
 
 
 def _rdPC():
@@ -195,13 +207,11 @@ def _rdPC():
     PCSiguiente = logicaEnvio.readPC(serialCOM, 1)
 
 
-
 def _rx():
     global flagNewWindow
 
-    datos = logicaEnvio.recibirDatos(serialCOM, initialAddress.get(), current_value_addr.get(), opcionLectEscr.get() - 3)
-
-
+    datos = logicaEnvio.recibirDatos(serialCOM, initialAddress.get(), current_value_addr.get(),
+                                     opcionLectEscr.get() - 3)
 
     if flagNewWindow:
         newWindow.destroy()
@@ -212,10 +222,10 @@ def _rx():
         flagNewWindow = True
 
 
-
 def _steps():
     logicaEnvio.ejecSteps(serialCOM, step.get(), nSteps.get())
     steps.deselect()
+
 
 botonAbrirPuerto.config(command=logica)
 botonCerrarPuerto.config(command=_cerrarPuerto)

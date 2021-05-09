@@ -163,3 +163,36 @@ def readPC(serialCOM, tipo):
 
 
     return datos
+
+def enviarDatosInstr(serialCOM, data):
+    address = '00000000'
+    addressToSend = address
+    error = False
+
+    for datos in data:
+
+        if len(datos) != 8 :
+            messagebox.showerror('ERROR', 'Longitud incorrecta, solo permitido 8 bytes.')
+            error = True
+        else:
+            enviarDatos(serialCOM, datos, 2)
+            enviarDatos(serialCOM, addressToSend, 1)
+
+            addressToSend = int(addressToSend, 16)
+            addressToSend = addressToSend + 4
+            addressToSend = hex(addressToSend)
+            addressToSend = addressToSend[2:]
+
+            if len(addressToSend) < 8 :
+                for i in range(8-len(addressToSend)):
+                    addressToSend = '0' + addressToSend
+
+            thestring = b'\x40\x00\x00\x00\x00'
+            serialCOM.write(thestring)
+            thestring = b'\x00\x00\x00\x00\x00'
+            serialCOM.write(thestring)
+
+    if not error:
+        messagebox.showinfo('Información', 'Datos enviados correctamente!')
+
+
