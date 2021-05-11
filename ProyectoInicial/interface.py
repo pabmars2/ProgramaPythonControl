@@ -71,8 +71,7 @@ numAdresses = Spinbox(miFrame, from_=1, to=10, textvariable=current_value_addr, 
 
 numSteps = Spinbox(miFrame, from_=1, to=10, textvariable=nSteps, justify=RIGHT, width=5, font=('Sans Serif', 13))
 
-botonRx = Button(miFrame, text='Recibir datos', state=DISABLED,
-                 font=('Sans Serif', 13))
+botonRx = Button(miFrame, text='Recibir datos', state=DISABLED, font=('Sans Serif', 13))
 
 
 def _cerrarPuerto():
@@ -187,6 +186,7 @@ def _sendExt():
     logicaEnvio.enviarExt(serialCOM, addressExt.get(), dataExt.get())
 
 
+
 def _rdPC():
     global flagNewWindow
 
@@ -206,12 +206,16 @@ def _rdPC():
 
     PCSiguiente = logicaEnvio.readPC(serialCOM, 1)
 
+    print(PCActual)
+    print(PCSiguiente)
 
 def _rx():
     global flagNewWindow
 
     datos = logicaEnvio.recibirDatos(serialCOM, initialAddress.get(), current_value_addr.get(),
                                      opcionLectEscr.get() - 3)
+
+    print(datos)
 
     if flagNewWindow:
         newWindow.destroy()

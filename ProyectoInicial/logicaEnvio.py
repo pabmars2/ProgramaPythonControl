@@ -52,6 +52,12 @@ def enviarExt(serialCOM, addressExt, dataExt):
     else:
         enviarDatos(serialCOM, addressExt, 1)
         enviarDatos(serialCOM, dataExt, 2)
+
+        thestring = b'\x30\x00\x00\x00\x00'
+        serialCOM.write(thestring)
+        thestring = b'\x00\x00\x00\x00\x00'
+        serialCOM.write(thestring)
+
         messagebox.showinfo('Información', 'Datos enviados correctamente!')
 
 
