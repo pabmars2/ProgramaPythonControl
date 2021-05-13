@@ -30,7 +30,7 @@ def abrirPuerto(indice):
             parity=serial.PARITY_NONE,
             stopbits=serial.STOPBITS_ONE,
             bytesize=serial.EIGHTBITS,
-            timeout=1
+            timeout=2
         )
         messagebox.showinfo('Información', 'Puerto ' + indice + ' abierto correctamente!')
         return ser
@@ -53,9 +53,9 @@ def enviarExt(serialCOM, addressExt, dataExt):
         enviarDatos(serialCOM, addressExt, 1)
         enviarDatos(serialCOM, dataExt, 2)
 
-        thestring = b'\x30\x00\x00\x00\x00'
+        thestring = b'\x31\x00\x00\x00\x00'
         serialCOM.write(thestring)
-        thestring = b'\x00\x00\x00\x00\x00'
+        thestring = b'\x01\x00\x00\x00\x00'
         serialCOM.write(thestring)
 
         messagebox.showinfo('Información', 'Datos enviados correctamente!')
@@ -64,58 +64,58 @@ def enviarExt(serialCOM, addressExt, dataExt):
 
 def debugMode(serialCOM, debug):
     if debug:
-        thestring = b'\x00\x00\x00\x00\x00'
+        thestring = b'\x01\x00\x00\x00\x00'
         serialCOM.write(thestring)
     else:
-        thestring = b'\x01\x00\x00\x00\x00'
+        thestring = b'\x00\x00\x00\x00\x00'
         serialCOM.write(thestring)
 
 
 def ejecSteps(serialCOM, stateSteps, numSteps):
     if stateSteps:
         if numSteps == 1:
-            thestring = b'\x08\x00\x40\x00\x00'
+            thestring = b'\x0d\x00\x40\x00\x00'
             serialCOM.write(thestring)
 
         if numSteps == 2:
-            thestring = b'\x08\x00\x80\x00\x00'
+            thestring = b'\x0d\x00\x80\x00\x00'
             serialCOM.write(thestring)
 
         if numSteps == 3:
-            thestring = b'\x08\x00\xc0\x00\x00'
+            thestring = b'\x0d\x00\xc0\x00\x00'
             serialCOM.write(thestring)
 
         if numSteps == 4:
-            thestring = b'\x08\x00\x00\x01\x00'
+            thestring = b'\x0d\x00\x00\x01\x00'
             serialCOM.write(thestring)
 
         if numSteps == 5:
-            thestring = b'\x08\x00\x40\x01\x00'
+            thestring = b'\x0d\x00\x40\x01\x00'
             serialCOM.write(thestring)
 
         if numSteps == 6:
-            thestring = b'\x08\x00\x80\x01\x00'
+            thestring = b'\x0d\x00\x80\x01\x00'
             serialCOM.write(thestring)
 
         if numSteps == 7:
-            thestring = b'\x08\x00\xc0\x01\x00'
+            thestring = b'\x0d\x00\xc0\x01\x00'
             serialCOM.write(thestring)
 
         if numSteps == 8:
-            thestring = b'\x08\x00\x00\x02\x00'
+            thestring = b'\x0d\x00\x00\x02\x00'
             serialCOM.write(thestring)
 
         if numSteps == 9:
-            thestring = b'\x08\x00\x40\x02\x00'
+            thestring = b'\x0d\x00\x40\x02\x00'
             serialCOM.write(thestring)
 
         if numSteps == 10:
-            thestring = b'\x08\x00\x80\x02\x00'
+            thestring = b'\x0d\x00\x80\x02\x00'
             serialCOM.write(thestring)
 
         messagebox.showinfo('Información', 'Ejecutando ' + numSteps + ' pasos en el sistema!')
     else:
-        thestring = b'\x00\x00\x00\x00\x00'
+        thestring = b'\x01\x00\x00\x00\x00'
         serialCOM.write(thestring)
 
 
@@ -135,10 +135,10 @@ def recibirDatos(serialCOM, address, nData, tipo):
             addressToSend = addressToSend[2:]
 
             if tipo == 0:
-                thestring = b'\x20\x00\x00\x00\x00'
+                thestring = b'\x21\x00\x00\x00\x00'
                 serialCOM.write(thestring)
             if tipo == 1:
-                thestring = b'\x10\x00\x00\x00\x00'
+                thestring = b'\x11\x00\x00\x00\x00'
                 serialCOM.write(thestring)
 
             recepcion = serialCOM.read(4)
@@ -154,10 +154,10 @@ def readPC(serialCOM, tipo):
     datos = ''
 
     if tipo == 0:
-        thestring = b'\x50\x00\x00\x00\x00'
+        thestring = b'\x51\x00\x00\x00\x00'
         serialCOM.write(thestring)
     if tipo == 1:
-        thestring = b'\x60\x00\x00\x00\x00'
+        thestring = b'\x61\x00\x00\x00\x00'
         serialCOM.write(thestring)
 
     recepcion = serialCOM.read(4)
@@ -193,10 +193,15 @@ def enviarDatosInstr(serialCOM, data):
                 for i in range(8-len(addressToSend)):
                     addressToSend = '0' + addressToSend
 
-            thestring = b'\x40\x00\x00\x00\x00'
+            thestring = b'\x41\x00\x00\x00\x00'
             serialCOM.write(thestring)
-            thestring = b'\x00\x00\x00\x00\x00'
+            thestring = b'\x01\x00\x00\x00\x00'
             serialCOM.write(thestring)
+            thestring = b'\x01\x01\x00\x00\x00'
+            serialCOM.write(thestring)
+            thestring = b'\x01\x00\x00\x00\x00'
+            serialCOM.write(thestring)
+
 
     if not error:
         messagebox.showinfo('Información', 'Datos enviados correctamente!')
