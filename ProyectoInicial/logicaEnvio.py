@@ -74,49 +74,49 @@ def debugMode(serialCOM, debug):
 def ejecSteps(serialCOM, stateSteps, numSteps):
     if stateSteps:
         if numSteps == 1:
-            thestring = b'\x0d\x00\x40\x00\x00'
-            serialCOM.write(thestring)
-
-        if numSteps == 2:
-            thestring = b'\x0d\x00\x80\x00\x00'
-            serialCOM.write(thestring)
-
-        if numSteps == 3:
-            thestring = b'\x0d\x00\xc0\x00\x00'
-            serialCOM.write(thestring)
-
-        if numSteps == 4:
             thestring = b'\x0d\x00\x00\x01\x00'
             serialCOM.write(thestring)
 
-        if numSteps == 5:
-            thestring = b'\x0d\x00\x40\x01\x00'
-            serialCOM.write(thestring)
-
-        if numSteps == 6:
-            thestring = b'\x0d\x00\x80\x01\x00'
-            serialCOM.write(thestring)
-
-        if numSteps == 7:
-            thestring = b'\x0d\x00\xc0\x01\x00'
-            serialCOM.write(thestring)
-
-        if numSteps == 8:
+        if numSteps == 2:
             thestring = b'\x0d\x00\x00\x02\x00'
             serialCOM.write(thestring)
 
+        if numSteps == 3:
+            thestring = b'\x0d\x00\x00\x03\x00'
+            serialCOM.write(thestring)
+
+        if numSteps == 4:
+            thestring = b'\x0d\x00\x00\x04\x00'
+            serialCOM.write(thestring)
+
+        if numSteps == 5:
+            thestring = b'\x0d\x00\x00\x05\x00'
+            serialCOM.write(thestring)
+
+        if numSteps == 6:
+            thestring = b'\x0d\x00\x00\x06\x00'
+            serialCOM.write(thestring)
+
+        if numSteps == 7:
+            thestring = b'\x0d\x00\x00\x07\x00'
+            serialCOM.write(thestring)
+
+        if numSteps == 8:
+            thestring = b'\x0d\x00\x00\x08\x00'
+            serialCOM.write(thestring)
+
         if numSteps == 9:
-            thestring = b'\x0d\x00\x40\x02\x00'
+            thestring = b'\x0d\x00\x00\x09\x00'
             serialCOM.write(thestring)
 
         if numSteps == 10:
-            thestring = b'\x0d\x00\x80\x02\x00'
+            thestring = b'\x0d\x00\x00\x0a\x00'
             serialCOM.write(thestring)
 
         messagebox.showinfo('Información', 'Ejecutando ' + numSteps + ' pasos en el sistema!')
-    else:
-        thestring = b'\x01\x00\x00\x00\x00'
-        serialCOM.write(thestring)
+    #else:
+     #   thestring = b'\x01\x00\x00\x00\x00'
+      #  serialCOM.write(thestring)
 
 
 def recibirDatos(serialCOM, address, nData, tipo):
