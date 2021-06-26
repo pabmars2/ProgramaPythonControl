@@ -7,19 +7,19 @@ raiz = Tk()
 raiz.title('Controlador debug RISC-V')
 raiz.resizable(0, 0)  # niega el redimensionamiento
 raiz.iconbitmap('icono.ico')  # determinamos el icono
-raiz.geometry('850x650')  # ancho x alto
+raiz.geometry('850x600')  # ancho x alto
 raiz.config(bg='grey')  # color de fondo
 
 miFrame = Frame()
 miFrame.pack(fill='both', expand='True')
 miFrame.config(bg='grey')
-miFrame.config(width='850', height='650')
+miFrame.config(width='850', height='600')
 
 newWindow = miFrame
 flagNewWindow = False
 serialCOM = None
 current_value = StringVar()
-current_value_addr = StringVar()
+#current_value_addr = StringVar()
 nSteps = StringVar()
 debug = IntVar()
 step = IntVar()
@@ -67,7 +67,7 @@ botonEnvioExt = Button(miFrame, text='Enviar', state=DISABLED,
 
 initialAddress = Entry(miFrame, font=('Sans Serif', 13), width=13, justify=RIGHT)
 
-numAdresses = Spinbox(miFrame, from_=1, to=10, textvariable=current_value_addr, justify=RIGHT, font=('Sans Serif', 13))
+#numAdresses = Spinbox(miFrame, from_=1, to=10, textvariable=current_value_addr, justify=RIGHT, font=('Sans Serif', 13))
 
 numSteps = Spinbox(miFrame, from_=1, to=10, textvariable=nSteps, justify=RIGHT, width=5, font=('Sans Serif', 13))
 
@@ -212,10 +212,11 @@ def _rdPC():
 def _rx():
     global flagNewWindow
 
-    datos = logicaEnvio.recibirDatos(serialCOM, initialAddress.get(), current_value_addr.get(),
+    datos = logicaEnvio.recibirDatos(serialCOM, initialAddress.get(), 1,
                                      opcionLectEscr.get() - 3)
 
     print(datos)
+    print(datos.decode())
 
     if flagNewWindow:
         newWindow.destroy()
@@ -245,15 +246,15 @@ botonRx.config(command=_rx)
 steps.config(command=_steps)
 
 logo = PhotoImage(file='logo.gif').subsample(4)
-Label(miFrame, image=logo, bg='grey').place(x=750, y=550)
+Label(miFrame, image=logo, bg='grey').place(x=750, y=500)
 Label(miFrame, text='Inserta el código en hexadecimal', bg='grey', font=('Sans Serif', 13)).place(x=50, y=20)
 Label(miFrame, text='Configuración del puerto serie', bg='grey', font=('Sans Serif', 13)).place(x=400, y=20)
 Label(miFrame, text='Selecciona el destino a escribir:', bg='grey', font=('Sans Serif', 13)).place(x=400, y=150)
 Label(miFrame, text='Dirección:', bg='grey', font=('Sans Serif', 13)).place(x=550, y=250)
 Label(miFrame, text='Datos:', bg='grey', font=('Sans Serif', 13)).place(x=550, y=280)
 Label(miFrame, text='Selecciona el destino a leer:', bg='grey', font=('Sans Serif', 13)).place(x=400, y=340)
-Label(miFrame, text='Dirección inicial:', bg='grey', font=('Sans Serif', 13)).place(x=550, y=440)
-Label(miFrame, text='Numero de direcciones:', bg='grey', font=('Sans Serif', 13)).place(x=550, y=470)
+Label(miFrame, text='Dirección:', bg='grey', font=('Sans Serif', 13)).place(x=480, y=440)
+#Label(miFrame, text='Numero de direcciones:', bg='grey', font=('Sans Serif', 13)).place(x=550, y=470)
 
 cuadroTexto.place(x=50, y=50)
 botonEnvio.place(x=90, y=550)
@@ -263,16 +264,16 @@ botonCerrarPuerto.place(x=750, y=60)
 seleccionEscritura1.place(x=450, y=180)
 seleccionEscritura2.place(x=450, y=210)
 debugCheck.place(x=350, y=110)
-steps.place(x=350, y=590)
+steps.place(x=350, y=555)
 addressExt.place(x=610, y=250)
 dataExt.place(x=610, y=280)
 botonEnvioExt.place(x=760, y=260)
 seleccionLectura1.place(x=450, y=370)
 seleccionLectura2.place(x=450, y=400)
-seleccionLecturaPC.place(x=450, y=550)
-initialAddress.place(x=675, y=440)
-numAdresses.place(x=600, y=470)
-botonRx.place(x=690, y=510)
-numSteps.place(x=650, y=595)
+seleccionLecturaPC.place(x=450, y=480)
+initialAddress.place(x=560, y=440)
+#numAdresses.place(x=600, y=470)
+botonRx.place(x=710, y=435)
+numSteps.place(x=650, y=560)
 
 raiz.mainloop()
