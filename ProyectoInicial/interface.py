@@ -24,6 +24,9 @@ nSteps = StringVar()
 debug = IntVar()
 step = IntVar()
 opcionLectEscr = IntVar()
+datos = ''
+datosPc = ''
+datosPcNext = ''
 
 ValoresComList = [f'COM{v + 1}' for v in range(256)]
 
@@ -144,14 +147,35 @@ def _wrExt():
 
 def _newWindow():
     global newWindow
+    global datos
+    global datosPc
+    global datosPcNext
+
     newWindow = tkinter.Toplevel(raiz)
     newWindow.title('Datos recibidos')
     newWindow.resizable(0, 0)  # niega el redimensionamiento
     newWindow.iconbitmap('icono.ico')  # determinamos el icono
-    newWindow.geometry('400x400')  # ancho x alto
+    newWindow.geometry('230x200')  # ancho x alto
     newWindow.config(bg='grey')  # color de fondo
-    Label(newWindow, text='Numero de direcciones:', bg='grey', font=('Sans Serif', 13)).place(x=100, y=100)
 
+    Label(newWindow, text='Datos:', bg='grey', font=('Sans Serif', 13)).place(x=10, y=30)
+    Label(newWindow, text='PC actual:', bg='grey', font=('Sans Serif', 13)).place(x=10, y=80)
+    Label(newWindow, text='PC próximo:', bg='grey', font=('Sans Serif', 13)).place(x=10, y=130)
+    datarxNew = Entry(newWindow, font=('Sans Serif', 12), width=12, justify=RIGHT)
+    datarxPcNew = Entry(newWindow, font=('Sans Serif', 12), width=12, justify=RIGHT)
+    datarxPcNextNew = Entry(newWindow, font=('Sans Serif', 12), width=12, justify=RIGHT)
+
+    datarxNew.place(x=110, y=30)
+    datarxPcNew.place(x=110, y=80)
+    datarxPcNextNew.place(x=110, y=130)
+
+    datarxNew.insert(0, datos)
+    datarxPcNew.insert(0, datosPc)
+    datarxPcNextNew.insert(0, datosPcNext)
+
+    datarxNew.config(state="readonly")
+    datarxPcNew.config(state="readonly")
+    datarxPcNew.config(state="readonly")
 
 
 def _rdInstr():
@@ -189,14 +213,8 @@ def _sendExt():
 
 def _rdPC():
     global flagNewWindow
-
-    if flagNewWindow:
-        newWindow.destroy()
-        flagNewWindow = False
-
-    if not flagNewWindow:
-        _newWindow()
-        flagNewWindow = True
+    global datosPc
+    global datosPcNext
 
     botonEnvio.config(state=DISABLED)
     botonEnvioExt.config(state=DISABLED)
@@ -208,15 +226,30 @@ def _rdPC():
 
     print(PCActual)
     print(PCSiguiente)
+    datosPc = PCActual.hex()
+    datosPc = datosPc[len(datosPc)::-1]
+    datosPcNext = PCSiguiente.hex()
+    datosPcNext = datosPcNext[len(datosPcNext)::-1]
+
+
+    if flagNewWindow:
+        newWindow.destroy()
+        flagNewWindow = False
+
+    if not flagNewWindow:
+        _newWindow()
+        flagNewWindow = True
+
 
 def _rx():
     global flagNewWindow
+    global datos
 
-    datos = logicaEnvio.recibirDatos(serialCOM, initialAddress.get(), 1,
-                                     opcionLectEscr.get() - 3)
+    datosrX = logicaEnvio.recibirDatos(serialCOM, initialAddress.get(), 1, opcionLectEscr.get() - 3)
 
-    print(datos)
-    print(datos.decode())
+    print(datosrX.hex())
+    datos = datosrX.hex()
+    datos = datos[6] + datos[7] + datos[4] + datos[5] + datos[2] + datos[3] + datos[0] + datos[1]
 
     if flagNewWindow:
         newWindow.destroy()
@@ -253,7 +286,7 @@ Label(miFrame, text='Selecciona el destino a escribir:', bg='grey', font=('Sans 
 Label(miFrame, text='Dirección:', bg='grey', font=('Sans Serif', 13)).place(x=550, y=250)
 Label(miFrame, text='Datos:', bg='grey', font=('Sans Serif', 13)).place(x=550, y=280)
 Label(miFrame, text='Selecciona el destino a leer:', bg='grey', font=('Sans Serif', 13)).place(x=400, y=340)
-Label(miFrame, text='Dirección:', bg='grey', font=('Sans Serif', 13)).place(x=480, y=440)
+Label(miFrame, text='Dirección inicial:', bg='grey', font=('Sans Serif', 13)).place(x=480, y=440)
 #Label(miFrame, text='Numero de direcciones:', bg='grey', font=('Sans Serif', 13)).place(x=550, y=470)
 
 cuadroTexto.place(x=50, y=50)
@@ -264,7 +297,7 @@ botonCerrarPuerto.place(x=750, y=60)
 seleccionEscritura1.place(x=450, y=180)
 seleccionEscritura2.place(x=450, y=210)
 debugCheck.place(x=350, y=110)
-steps.place(x=350, y=555)
+steps.place(x=350, y=550)
 addressExt.place(x=610, y=250)
 dataExt.place(x=610, y=280)
 botonEnvioExt.place(x=760, y=260)

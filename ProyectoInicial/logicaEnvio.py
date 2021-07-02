@@ -121,7 +121,6 @@ def ejecSteps(serialCOM, stateSteps, numSteps):
 
 def recibirDatos(serialCOM, address, nData, tipo):
     datos = ''
-
     if len(address) != 8 :
         messagebox.showerror('ERROR', 'Longitud incorrecta, solo permitido 8 bytes.')
     else:
@@ -137,8 +136,12 @@ def recibirDatos(serialCOM, address, nData, tipo):
             if tipo == 0:
                 thestring = b'\x21\x00\x00\x00\x00'
                 serialCOM.write(thestring)
+                thestring = b'\x01\x00\x00\x00\x00'
+                serialCOM.write(thestring)
             if tipo == 1:
                 thestring = b'\x11\x00\x00\x00\x00'
+                serialCOM.write(thestring)
+                thestring = b'\x01\x00\x00\x00\x00'
                 serialCOM.write(thestring)
 
             recepcion = serialCOM.read(4)
@@ -146,7 +149,7 @@ def recibirDatos(serialCOM, address, nData, tipo):
             if recepcion == b'' :
                 messagebox.showerror('ERROR', 'Error al recibir datos.')
             else:
-                datos = recepcion, datos
+                datos = recepcion
 
         return datos
 
@@ -156,8 +159,12 @@ def readPC(serialCOM, tipo):
     if tipo == 0:
         thestring = b'\x51\x00\x00\x00\x00'
         serialCOM.write(thestring)
+        thestring = b'\x01\x00\x00\x00\x00'
+        serialCOM.write(thestring)
     if tipo == 1:
         thestring = b'\x61\x00\x00\x00\x00'
+        serialCOM.write(thestring)
+        thestring = b'\x01\x00\x00\x00\x00'
         serialCOM.write(thestring)
 
     recepcion = serialCOM.read(4)
@@ -165,7 +172,7 @@ def readPC(serialCOM, tipo):
     if recepcion == b'':
         messagebox.showerror('ERROR', 'Error al recibir datos.')
     else:
-        datos = recepcion, datos
+        datos = recepcion
 
 
     return datos
